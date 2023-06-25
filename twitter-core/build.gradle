@@ -16,6 +16,7 @@
  */
 
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -62,15 +63,41 @@ dependencies {
     api dependency.gson
     api dependency.okHttp
 
-    androidTestCompile dependency.mockito
-    androidTestCompile dependency.dexmakerMockito
+    androidTestImplementation dependency.mockito
+    androidTestImplementation dependency.dexmakerMockito
 
-    testCompile dependency.mockito
-    testCompile dependency.junit
-    testCompile dependency.retrofitMock
-    testCompile(dependency.robolectric) {
+    testImplementation dependency.mockito
+    testImplementation dependency.junit
+    testImplementation dependency.retrofitMock
+    testImplementation(dependency.robolectric) {
         exclude group: 'commons-logging', module: 'commons-logging'
         exclude group: 'org.apache.httpcomponents', module: 'httpclient'
     }
-    testCompile dependency.equalsVerifier
+    testImplementation dependency.equalsVerifier
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                // Applies the component for the release build variant.
+                from components.release
+
+                // You can then customize attributes of the publication as shown below.
+                groupId = 'com.twitter.sdk.android' 
+                artifactId = 'twitter-core' 
+                version = '3.3.0'
+            }
+            // Creates a Maven publication called "debug".
+            debug(MavenPublication) {
+                // Applies the component for the debug build variant.
+                from components.debug
+
+                groupId = 'com.twitter.sdk.android' 
+                artifactId = 'twitter-core'
+                version = '3.3.0'
+            }
+        }
+    }
 }
